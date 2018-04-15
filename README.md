@@ -1,4 +1,4 @@
-# Silk
+# Silk (NOT READY)
 SIDH Ephemeral Messaging Protocol
 <hr>
 This entire repository is containing the initial raw code.<br>
