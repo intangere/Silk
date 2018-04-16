@@ -45,7 +45,7 @@ class Complex(object):
 		return '(%u, %u)' % (self.re %p, self.im %p)
 
 	def __repr__(self):
-		return 'Complex(' + str(self.re) +  ', '+ str(self.im) + ')'
+		return 'Complex(' + str(self.re) +  ', ' + str(self.im) + ')'
 
 	def __pow__(self, power): #only squares required
 		return Complex(((self.re+self.im)*(self.re-self.im))%p, (2*self.im*self.re)%p)

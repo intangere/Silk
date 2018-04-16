@@ -36,7 +36,7 @@ class Echo(Protocol):
               if data['t'] in users.keys():
                  users[data['t']].transport.write(pdata)
               else:
-                 self.sendLine(offlinep(data['t']))
+                 self.transport.write(offlinep(data['t']) + b'\r\n')
 
     def connectionLost(self, reason):
         if self.username:

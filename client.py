@@ -20,26 +20,23 @@ from protocol import *
 
 client = None
 
-#n_Alice, PKA = genSecPubAlice()
-#n_Bob, PKB = genSecPubBob()
-
-#SKA = shared_secret_Alice(n_Alice, PKB, splits_Alice, MAX_Alice)
-#print("Alice's shared secret:")
-#print(SKA)
-
-##SKB = shared_secret_Bob(n_Bob, PKA, splits_Bob, MAX_Bob)
-#print("Bob's shared secret:")
-#print(SKB)
-
 otpKeys = {}
 msgQueue = {}
 
 locked = False
 
+def secureEval(p):
+    if p.replace('[', '').replace(']', '').replace('Complex(', '') \
+       .replace(')', '').replace(' ', '').replace(',', '').isdigit():
+       return eval(p)
+    else:
+       print("ARBITRARY INJECTION DETECTED. SHUTDOWN.")
+       sys.exit(1)
+
 class EchoClient(LineReceiver):
 
     def __init__(self):
-        pass
+        self.username = None
 
     def connectionMade(self):
         global client
@@ -57,9 +54,14 @@ class EchoClient(LineReceiver):
            log('Username taken.')
            self.transport.close()
 
+        if data['code'] == '3':
+           print('%s is offline. Cannot send message. Offline messaging is unsupported for now.' % data['t'])
+           global locked
+           locked = False
+
         if data['code'] == '4':
               n_Bob, PKB = genSecPubBob()
-              Alice = eval(data['p']) #This line is unsecure as fuck. Please wait for the patch.
+              Alice = secureEval(data['p'])
               SKB = shared_secret_Bob(n_Bob, Alice, splits_Bob, MAX_Bob)
               otpKeys[data['u']] = SKB
               print(SKB)
@@ -68,7 +70,7 @@ class EchoClient(LineReceiver):
 
         if data['code'] == '5':
 
-           shared = shared_secret_Alice(otpKeys[data['u']][0], eval(data['p']), splits_Alice, MAX_Alice) #Eval insecure
+           shared = shared_secret_Alice(otpKeys[data['u']][0], secureEval(data['p']), splits_Alice, MAX_Alice)
            shared = str(shared.re) + str(shared.im)
            self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
            global locked
@@ -135,6 +137,19 @@ class ReadLine(LineReceiver):
            print('You are not registered, cannot send.')
 
     def _send(self, args):
+
+        if not client:
+           print('Please wait till you\'re connected')
+           return
+        else:
+          if not client.username:
+             print('Select a username by typing \'name <your username>\'')
+             return
+
+        if args[0] == client.username:
+           print('You may not send messages to yourself, yet.')
+           return
+
         to = args[0]
         msg = ' '.join(args[1:])
         if len(msg) > 452:
@@ -180,4 +195,3 @@ def main(reactor):
 
 if __name__ == '__main__':
     task.react(main)
-

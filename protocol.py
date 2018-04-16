@@ -21,7 +21,7 @@ def genID():
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(32))
 
 def offlinep(to):
-    return msgpack.packb({'code' : '3', 't' : to}, user_bin_type=True)
+    return msgpack.packb({'code' : '3', 't' : to}, use_bin_type=True)
 
 def buildExchange(to, u, pub):
     return msgpack.packb({'code' : '4', 't' : to, 'p' : pub, 'u' : u}, use_bin_type=True)
