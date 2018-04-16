@@ -32,3 +32,17 @@ Each message uses a new SIDH key which should be self explanatory.<br>
 <br>
 I'll rewrite this description and document it once the library is actually ready for use.<br>
 
+<h1>Todo</h1>
+<br>
+<pre>
+  - Ensure secureEval blocks any sort of code injection
+  - Write actual event handlers instead of bootleg if statements
+  - Make messaging yourself possible
+  - Username registration rather than one time names
+  - Offline messaging via a mailbox type structure
+  - ./silk -read (read missed messages without staying online)
+  - ./silk -send <to> <msg> (write messages without staying online)
+  - ./silk -shred
+  - Contact storage
+  - User fingerprints for user verification
+</pre>
