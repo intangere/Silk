@@ -30,7 +30,9 @@ If SIDH ends up being broken, and your AES key is based off the exchange.. it's 
 <br>
 <b>Edit: I've now found reason to support AES keys. "Longer messages"</b></br>
 <br>
-That being said I'd probably split the exchanged key and pad+cipher the text itself.
+That being said I'd probably split the exchanged key and pad+cipher the text itself.<br>
+For messages that are sent while both users are online, I'm considering an experimental feature in which the current timestamp is combined with the second<br>
+half of the pre-key which would be used to derive a cipher text that must be read within a specific time frame or even the receiever cannot decipher the message.<br>
 <br>
 <br>
 Each message uses a new SIDH key which should be self explanatory.<br>
