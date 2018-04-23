@@ -27,6 +27,10 @@ send <to username> <your message here>
 This library uses a SIDH key exchange with a vernam cipher after the exchange.<br>
 There is no point in using AES after the exchange. <br>
 If SIDH ends up being broken, and your AES key is based off the exchange.. it's pointless.<br>
+<b>Edit:</b> I've now found reason to support AES keys.<br>
+"Longer message length". <br>
+That being said I'd probably split the exchanged key and pad+cipher the text itself<br>
+possibly with a derivation of vernam.<br>
 <br>
 Each message uses a new SIDH key which should be self explanatory.<br>
 <br>
