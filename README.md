@@ -28,14 +28,12 @@ This library uses a SIDH key exchange with a vernam cipher after the exchange.<b
 There is no point in using AES after the exchange. <br>
 If SIDH ends up being broken, and your AES key is based off the exchange.. it's pointless.<br>
 <br>
-<b>Edit: I've now found reason to support AES keys.</b><br>
-<b>Longer messages</B>
+<b>Edit: I've now found reason to support AES keys. "Longer messages"</b></br>
 <br>
 That being said I'd probably split the exchanged key and pad+cipher the text itself.
 <br>
 <br>
 Each message uses a new SIDH key which should be self explanatory.<br>
-<br>
 I'll rewrite this description and document it once the library is actually ready for use.<br>
 
 <h1>Todo</h1>
