@@ -55,5 +55,5 @@ I'll rewrite this description and document it once the library is actually ready
   - Time-frame locked messages which have to be opened within x amount of seconds
     or the receiever can no longer read the messages. Both users have to be online
     for something like this to work.
-  - NewHope signature signing for identity verification for now
+  - SPHINCS(+)-256 Signatures for identity verification
 </pre>
