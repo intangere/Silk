@@ -56,4 +56,7 @@ I'll rewrite this description and document it once the library is actually ready
     or the receiever can no longer read the messages. Both users have to be online
     for something like this to work.
   - SPHINCS(+)-256 Signatures for identity verification
+  - Use the one time exhanged key to seed a mersenee twister based on the key if the
+    key isn't long enough to vernam cipher the text. Use that then to cipher the text. Probably pad the text too.
+  - Perhaps cipher the text with a seed attached randomly in the message before it's vernam ciphered and padded. 
 </pre>
