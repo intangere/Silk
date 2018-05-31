@@ -120,7 +120,7 @@ class ReadLine(LineReceiver):
         self.locked = False
 
     def connectionMade(self):
-        self.sendLine(b"Web checker console. Type 'help' for help.")
+        self.sendLine(b"Silk -000- Console. Type 'help' for help.")
 
     def lineReceived(self, line):
         if not line:
