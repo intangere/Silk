@@ -37,6 +37,14 @@ class EchoClient(LineReceiver):
 
     def __init__(self):
         self.username = None
+        self.mapper = {
+                        '-1' : self.disconnect,
+                        '3'  : self.userOffline,
+                        '4'  : self.initExchange,
+                        '5'  : self.sendMessage,
+                        '6'  : self.readMessage
+                      }
+
 
     def connectionMade(self):
         global client
@@ -50,16 +58,21 @@ class EchoClient(LineReceiver):
 
         print(data)
 
-        if data['code'] == '-1':
-           log('Username taken.')
-           self.transport.close()
+        self.mapper.get(data['code'], self.invalidPacket)(data)
 
-        if data['code'] == '3':
+    def disconnect(self, data):
+            log('Username taken.')
+            self.transport.close()
+
+    def invalidPacket(self, data):
+        print('Invalid packet with code %s' % data['code'])
+
+    def userOffline(self, data):
            print('%s is offline. Cannot send message. Offline messaging is unsupported for now.' % data['t'])
            global locked
            locked = False
 
-        if data['code'] == '4':
+    def initExchange(self, data):
               n_Bob, PKB = genSecPubBob()
               Alice = secureEval(data['p'])
               SKB = shared_secret_Bob(n_Bob, Alice, splits_Bob, MAX_Bob)
@@ -68,8 +81,7 @@ class EchoClient(LineReceiver):
               print('Shared secret ^')
               self.sendLine(completeExchange(data['u'], self.username, str(PKB)))
 
-        if data['code'] == '5':
-
+    def sendMessage(self, data):
            shared = shared_secret_Alice(otpKeys[data['u']][0], secureEval(data['p']), splits_Alice, MAX_Alice)
            shared = str(shared.re) + str(shared.im)
            self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
@@ -77,7 +89,7 @@ class EchoClient(LineReceiver):
            locked = False
            #delete key on our side
 
-        if data['code'] == '6':
+    def readMessage(self, data):
            shared = str(otpKeys[data['u']].re) + str(otpKeys[data['u']].im)
            print('[%s]: %s' % (data['u'], genVernamCipher(data['msg'], shared)))
            global locked

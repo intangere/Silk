@@ -1,4 +1,4 @@
-# Silk (NOT READY)
+# Silk (ALPHA)
 SIDH Ephemeral Messaging Protocol
 <hr>
 This entire repository is containing the initial raw code.<br>
@@ -40,7 +40,7 @@ I'll rewrite this description and document it once the library is actually ready
 <br>
 <pre>
   - Ensure secureEval blocks any sort of code injection
-  - Write actual event handlers instead of bootleg if statements
+  - [DONE]: Write actual event handlers instead of bootleg if statements
   - Make messaging yourself possible
   - Username registration rather than one time names
   - Offline messaging via a mailbox type structure
