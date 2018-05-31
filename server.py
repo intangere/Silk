@@ -15,28 +15,39 @@ class Echo(Protocol):
 
     def __init__(self):
         self.username = None
+        self.mapper = {
+                       '0' : self.usernamePacket,
+                       '4' : self.relayMessage,
+                       '5' : self.relayMessage,
+                       '6' : self.relayMessage,
+                      }
 
     def dataReceived(self, data):
 
         pdata = data
         data = msgpack.unpackb(data[:-2], raw=False)
 
-        if data['code'] == '0':
-           if data['u'] not in users.keys():
-              self.username = data['u']
-              users[self.username] = self
-              log('%s connected successfully' % self.username)
-           else:
-              log('Username %s taken' % data['u'])
-              self.sendLine(username_takenp(username))
-              self.transport.close() #send username taken
+        self.mapper.get(data['code'], self.unknownPacket)(data, pdata)
 
-        if data['code'] == '4' or data['code'] == '5' or data['code'] == '6':
-           if data['u'] in users.keys():
-              if data['t'] in users.keys():
-                 users[data['t']].transport.write(pdata)
-              else:
-                 self.transport.write(offlinep(data['t']) + b'\r\n')
+    def usernamePacket(self, data, pdata):
+        if data['u'] not in users.keys():
+           self.username = data['u']
+           users[self.username] = self
+           log('%s connected successfully' % self.username)
+        else:
+           log('Username %s taken' % data['u'])
+           self.sendLine(username_takenp(username))
+           self.transport.close() #send username taken
+
+    def relayMessage(self, data, pdata):
+        if data['u'] in users.keys():
+           if data['t'] in users.keys():
+              users[data['t']].transport.write(pdata)
+           else:
+              self.transport.write(offlinep(data['t']) + b'\r\n')
+
+    def unknownPacket(self, data):
+        print('Received unknown packet with data: %s' % repr(data))
 
     def connectionLost(self, reason):
         if self.username:
