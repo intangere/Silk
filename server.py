@@ -32,6 +32,12 @@ class Echo(Protocol):
     def usernamePacket(self, data, pdata):
         if data['u'] not in users.keys():
            self.username = data['u']
+
+           if data.get('o', None):
+              if self.username == data['o']:
+                 del users[data['o']]
+              else:
+                 log('%s tried to spoof username change of %s' % (self.username, data['o']))
            users[self.username] = self
            log('%s connected successfully' % self.username)
         else:

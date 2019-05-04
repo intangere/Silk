@@ -147,8 +147,12 @@ class ReadLine(LineReceiver):
 
     def _name(self, args):
         if client:
-           client.username = args[0]
-           client.sendLine(build_userp(args[0]))
+           if client.username:
+              client.sendLine(build_userp(args[0], client.username))
+              client.username = args[0]
+           else:
+              client.username = args[0]
+              client.sendLine(build_userp(args[0]))
         else:
            print('You are not registered, cannot send.')
 

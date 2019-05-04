@@ -2,7 +2,9 @@ import msgpack
 import string
 import random
 
-def build_userp(username):
+def build_userp(username, old_username = None):
+    if old_username:
+       return msgpack.packb({'code' : '0', 'u' : username, 'o': old_username}, use_bin_type=True)
     return msgpack.packb({'code' : '0', 'u' : username}, use_bin_type=True)
 
 def build_msgp(to, _from, msg):

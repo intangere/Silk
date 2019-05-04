@@ -47,7 +47,8 @@ I'll rewrite this description and document it once the library is actually ready
   - ./silk -shred
   - Contact storage
   - User fingerprints for user verification 
-  - bug where username isn't properly freed
+  - packet verification through NaCl or something a like
+  - [DONE]: bug where username isn't properly freed
   - [DONE]: Delete shared secrets immediately after use
   - [DONE]: Remove the only usage of eval
   - [DONE]: Write actual event handlers instead of bootleg if statements
