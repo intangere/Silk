@@ -18,6 +18,8 @@ from sidh import Complex
 from vernam import genVernamCipher
 from protocol import *
 
+import os
+
 client = None
 
 otpKeys = {}
@@ -84,13 +86,18 @@ class EchoClient(LineReceiver):
         self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
         global locked
         locked = False
-        #delete key on our side
+
+        otpKeys[data['u']] = os.urandom(1000)
+        del otpKeys[data['u']]
 
     def readMessage(self, data):
         shared = str(otpKeys[data['u']].re) + str(otpKeys[data['u']].im)
         print('[%s]: %s' % (data['u'], genVernamCipher(data['msg'], shared)))
         global locked
         locked = False
+
+        otpKeys[data['u']] = os.urandom(1000)
+        del otpKeys[data['u']]
 
 class EchoClientFactory(ClientFactory):
     protocol = EchoClient

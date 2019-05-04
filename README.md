@@ -39,8 +39,6 @@ I'll rewrite this description and document it once the library is actually ready
 <h1>Todo</h1>
 <br>
 <pre>
-  - [DONE]: Remove the only usage of eval
-  - [DONE]: Write actual event handlers instead of bootleg if statements
   - Make messaging yourself possible
   - Username registration rather than one time names
   - Offline messaging via a mailbox type structure
@@ -50,6 +48,9 @@ I'll rewrite this description and document it once the library is actually ready
   - Contact storage
   - User fingerprints for user verification 
   - bug where username isn't properly freed
+  - [DONE]: Delete shared secrets immediately after use
+  - [DONE]: Remove the only usage of eval
+  - [DONE]: Write actual event handlers instead of bootleg if statements
 </pre>
 <h3>Ideas</h3>
 <pre>
