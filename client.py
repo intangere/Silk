@@ -47,55 +47,50 @@ class EchoClient(LineReceiver):
                         '6'  : self.readMessage
                       }
 
-
     def connectionMade(self):
         global client
         client = self
-        print('Connected')
+        print('Connected to Silk server')
 
     def lineReceived(self, line):
-
-        #print(b'GOT: ' + line)
         data = unpack(line)
-
-        #print(data)
-
         self.mapper.get(data['code'], self.invalidPacket)(data)
 
     def userTaken(self, data):
-            log('Username taken.')
-            self.transport.loseConnection()
+        log('Username taken.')
+        self.transport.loseConnection()
 
     def invalidPacket(self, data):
         print('Invalid packet with code %s' % data['code'])
 
     def userOffline(self, data):
-           print('%s is offline. Cannot send message. Offline messaging is unsupported for now.' % data['t'])
-           global locked
-           locked = False
+        print('%s is offline. Cannot send message. Offline messaging is unsupported for now.' % data['t'])
+        global locked
+        locked = False
 
     def initExchange(self, data):
-              n_Bob, PKB = genSecPubBob()
-              Alice = decodePubKey(data)
-              SKB = shared_secret_Bob(n_Bob, Alice, splits_Bob, MAX_Bob)
-              otpKeys[data['u']] = SKB
-              #print(SKB)
-              #print('Shared secret ^')
-              self.sendLine(completeExchange(data['u'], self.username, PKB))
+        """Receive the shared secret from the sender and finish the exchange
+           SKB is bob's shared secret
+        """
+        n_Bob, PKB = genSecPubBob()
+        Alice = decodePubKey(data)
+        SKB = shared_secret_Bob(n_Bob, Alice, splits_Bob, MAX_Bob)
+        otpKeys[data['u']] = SKB
+        self.sendLine(completeExchange(data['u'], self.username, PKB))
 
     def sendMessage(self, data):
-           shared = shared_secret_Alice(otpKeys[data['u']][0], decodePubKey(data), splits_Alice, MAX_Alice)
-           shared = str(shared.re) + str(shared.im)
-           self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
-           global locked
-           locked = False
-           #delete key on our side
+        shared = shared_secret_Alice(otpKeys[data['u']][0], decodePubKey(data), splits_Alice, MAX_Alice)
+        shared = str(shared.re) + str(shared.im)
+        self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
+        global locked
+        locked = False
+        #delete key on our side
 
     def readMessage(self, data):
-           shared = str(otpKeys[data['u']].re) + str(otpKeys[data['u']].im)
-           print('[%s]: %s' % (data['u'], genVernamCipher(data['msg'], shared)))
-           global locked
-           locked = False
+        shared = str(otpKeys[data['u']].re) + str(otpKeys[data['u']].im)
+        print('[%s]: %s' % (data['u'], genVernamCipher(data['msg'], shared)))
+        global locked
+        locked = False
 
 class EchoClientFactory(ClientFactory):
     protocol = EchoClient
@@ -166,16 +161,21 @@ class ReadLine(LineReceiver):
 
         to = args[0]
         msg = ' '.join(args[1:])
+
         if len(msg) > 452:
            print('Message longer than 432 characters.')
            return
+
         n_Alice, PKA = genSecPubAlice()
         otpKeys[to] = (n_Alice, PKA)
         client.sendLine(buildExchange(to, client.username, PKA))
+
         global locked
         locked = True
+
         if to not in msgQueue.keys():
            msgQueue[to] = []
+
         msgQueue[to].append(msg)
         print('[%s]: %s' % (client.username, msg))
 
@@ -204,8 +204,6 @@ def main(reactor):
     reactor.connectTCP('localhost', 8000, factory)
     stdio.StandardIO(ReadLine())
     return factory.done
-
-
 
 if __name__ == '__main__':
     task.react(main)
