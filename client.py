@@ -25,20 +25,22 @@ msgQueue = {}
 
 locked = False
 
-def secureEval(p):
-    if p.replace('[', '').replace(']', '').replace('Complex(', '') \
-       .replace(')', '').replace(' ', '').replace(',', '').isdigit():
-       return eval(p)
-    else:
-       print("ARBITRARY INJECTION DETECTED. SHUTDOWN.")
-       sys.exit(1)
+def decodePubKey(data):
+
+    pzero = data['p0'].split(',')
+    pone = data['p1'].split(',')
+    ptwo = data['p2'].split(',')
+
+    return [ Complex(int(pzero[0]), int(pzero[1])),
+             Complex(int(pone[0]), int(pone[1])),
+             Complex(int(ptwo[0]), int(ptwo[1])) ]
 
 class EchoClient(LineReceiver):
 
     def __init__(self):
         self.username = None
         self.mapper = {
-                        '-1' : self.disconnect,
+                        '-1' : self.userTaken,
                         '3'  : self.userOffline,
                         '4'  : self.initExchange,
                         '5'  : self.sendMessage,
@@ -53,16 +55,16 @@ class EchoClient(LineReceiver):
 
     def lineReceived(self, line):
 
-        print(b'GOT: ' + line)
+        #print(b'GOT: ' + line)
         data = unpack(line)
 
-        print(data)
+        #print(data)
 
         self.mapper.get(data['code'], self.invalidPacket)(data)
 
-    def disconnect(self, data):
+    def userTaken(self, data):
             log('Username taken.')
-            self.transport.close()
+            self.transport.loseConnection()
 
     def invalidPacket(self, data):
         print('Invalid packet with code %s' % data['code'])
@@ -74,15 +76,15 @@ class EchoClient(LineReceiver):
 
     def initExchange(self, data):
               n_Bob, PKB = genSecPubBob()
-              Alice = secureEval(data['p'])
+              Alice = decodePubKey(data)
               SKB = shared_secret_Bob(n_Bob, Alice, splits_Bob, MAX_Bob)
               otpKeys[data['u']] = SKB
-              print(SKB)
-              print('Shared secret ^')
-              self.sendLine(completeExchange(data['u'], self.username, str(PKB)))
+              #print(SKB)
+              #print('Shared secret ^')
+              self.sendLine(completeExchange(data['u'], self.username, PKB))
 
     def sendMessage(self, data):
-           shared = shared_secret_Alice(otpKeys[data['u']][0], secureEval(data['p']), splits_Alice, MAX_Alice)
+           shared = shared_secret_Alice(otpKeys[data['u']][0], decodePubKey(data), splits_Alice, MAX_Alice)
            shared = str(shared.re) + str(shared.im)
            self.sendLine(buildMessage(data['u'], data['t'], genVernamCipher(msgQueue[data['u']].pop(0), shared)))
            global locked
@@ -169,13 +171,13 @@ class ReadLine(LineReceiver):
            return
         n_Alice, PKA = genSecPubAlice()
         otpKeys[to] = (n_Alice, PKA)
-        client.sendLine(buildExchange(to, client.username, str(PKA)))
+        client.sendLine(buildExchange(to, client.username, PKA))
         global locked
         locked = True
         if to not in msgQueue.keys():
            msgQueue[to] = []
         msgQueue[to].append(msg)
-        print(msg)
+        print('[%s]: %s' % (client.username, msg))
 
     def _quit(self, _):
         if client:

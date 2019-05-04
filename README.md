@@ -39,7 +39,7 @@ I'll rewrite this description and document it once the library is actually ready
 <h1>Todo</h1>
 <br>
 <pre>
-  - Ensure secureEval blocks any sort of code injection
+  - [DONE]: Remove the only usage of eval
   - [DONE]: Write actual event handlers instead of bootleg if statements
   - Make messaging yourself possible
   - Username registration rather than one time names
@@ -48,7 +48,8 @@ I'll rewrite this description and document it once the library is actually ready
   - ./silk -send <to> <msg> (write messages without staying online)
   - ./silk -shred
   - Contact storage
-  - User fingerprints for user verification
+  - User fingerprints for user verification 
+  - bug where username isn't properly freed
 </pre>
 <h3>Ideas</h3>
 <pre>

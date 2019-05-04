@@ -24,10 +24,16 @@ def offlinep(to):
     return msgpack.packb({'code' : '3', 't' : to}, use_bin_type=True)
 
 def buildExchange(to, u, pub):
-    return msgpack.packb({'code' : '4', 't' : to, 'p' : pub, 'u' : u}, use_bin_type=True)
+    return msgpack.packb({'code' : '4', 't' : to, \
+                          'p0' : '%s,%s' % (pub[0].re, pub[0].im),  \
+                          'p1' : '%s,%s' % (pub[1].re, pub[1].im),  \
+                          'p2' : '%s,%s' % (pub[2].re, pub[2].im), 'u' : u}, use_bin_type=True)
 
 def completeExchange(to, u, pub):
-    return msgpack.packb({'code' : '5', 't' : to, 'p' : pub, 'u' : u}, use_bin_type=True)
+    return msgpack.packb({'code' : '5', 't' : to, \
+                          'p0' : '%s,%s' % (pub[0].re, pub[0].im),  \
+                          'p1' : '%s,%s' % (pub[1].re, pub[1].im),  \
+                          'p2' : '%s,%s' % (pub[2].re, pub[2].im), 'u' : u}, use_bin_type=True)
 
 def buildMessage(to, username, msg):
     return msgpack.packb({'code' : '6', 't' : to, 'u' : username, 'msg' : msg}, use_bin_type=True)

@@ -36,8 +36,8 @@ class Echo(Protocol):
            log('%s connected successfully' % self.username)
         else:
            log('Username %s taken' % data['u'])
-           self.sendLine(username_takenp(username))
-           self.transport.close() #send username taken
+           self.transport.write(username_takenp(data['u']))
+           self.transport.loseConnection() #send username taken
 
     def relayMessage(self, data, pdata):
         if data['u'] in users.keys():

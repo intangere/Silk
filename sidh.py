@@ -15,6 +15,10 @@ from random import randint
 
 #own class for complex numbers
 
+def print(_):
+    """Hide debug messages"""
+    return
+
 class Complex(object):
 	def __init__(self, real, imag=0):
 		self.re = int(real)
